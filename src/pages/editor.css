@@ -1,0 +1,63 @@
+html, body { background: transparent; height: 100%; }
+.backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, .32);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 10vh 16px 16px;
+  animation: fade .12s ease-out;
+}
+.dialog {
+  width: min(480px, 100%);
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px 16px;
+  animation: pop .14s ease-out;
+}
+h1 { font-size: 16px; margin: 0; }
+.h-ic { margin-right: 6px; }
+.subject { margin: 2px 0 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.field-label { display: block; font-weight: 600; margin-bottom: 4px; }
+textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  background: var(--note-bg);
+  color: var(--note-text);
+  border: 1px solid var(--note-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  line-height: 1.5;
+}
+.section-head { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 6px; }
+.section-head .field-label { margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 3px 8px 3px 4px;
+  cursor: pointer;
+}
+.chip .check { width: 14px; text-align: center; font-size: 11px; color: var(--muted); }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--surface); }
+.chip[aria-pressed="true"] .check { color: var(--accent); }
+.newlabel {
+  margin-top: 10px; padding: 12px; border: 1px dashed var(--border); border-radius: 6px;
+  display: grid; gap: 10px;
+}
+.newlabel .line { display: flex; gap: 8px; }
+.newlabel .emoji { width: 56px; text-align: center; font-size: 16px; }
+.newlabel .text { flex: 1; }
+.quick { display: flex; flex-wrap: wrap; gap: 2px; }
+.quick button { border: 0; background: none; font-size: 18px; padding: 2px 4px; border-radius: 4px; cursor: pointer; }
+.quick button:hover { background: var(--surface); }
+.preview { display: flex; align-items: center; gap: 8px; }
+footer { display: flex; align-items: center; gap: 8px; margin-top: 18px; }
+footer .spacer { flex: 1; }
+.hint { font-size: 12px; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: translateY(-6px) scale(.98); } }

@@ -1,0 +1,42 @@
+:root { color-scheme: light dark; }
+body { background: var(--surface); }
+main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+header h1 { font-size: 22px; margin: 0 0 4px; }
+header p { margin: 0 0 24px; }
+section {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+section h2 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+section h2 .count { font-weight: 500; color: var(--muted); font-size: 13px; }
+.label-row { display: grid; grid-template-columns: 64px 1fr 40px auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.label-row:last-of-type { border-bottom: 0; }
+.label-row .emoji { text-align: center; font-size: 16px; }
+.label-row input[type="color"] { width: 36px; height: 30px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: none; cursor: pointer; }
+.label-row .actions { display: flex; gap: 2px; align-items: center; }
+.label-row .preview { grid-column: 1 / -1; display: none; }
+.icon-btn { border: 0; background: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; color: var(--muted); }
+.icon-btn:hover:not(:disabled) { background: var(--surface); color: var(--text); }
+.icon-btn:disabled { opacity: .35; cursor: default; }
+.icon-btn.danger:hover { color: var(--danger); }
+.toolbar { display: flex; gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+.search { width: 100%; margin-bottom: 10px; }
+.notes { display: grid; gap: 8px; }
+.note-card { border: 1px solid var(--border); border-left: 4px solid var(--note-border); border-radius: 6px; padding: 10px 12px; background: var(--bg); }
+.note-card .top { display: flex; gap: 8px; align-items: baseline; }
+.note-card .subj { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-card .date { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.note-card .pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.note-card .text { margin-top: 6px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 7.5em; overflow: hidden; }
+.meter { height: 8px; border-radius: 4px; background: var(--surface); overflow: hidden; border: 1px solid var(--border); }
+.meter > div { height: 100%; background: var(--accent); }
+.meter.warn > div { background: #e8a10e; }
+.meter.full > div { background: var(--danger); }
+.status { min-height: 1.4em; margin: 8px 0 0; }
+@media (max-width: 520px) {
+  .label-row { grid-template-columns: 56px 1fr 40px; }
+  .label-row .actions { grid-column: 1 / -1; justify-content: flex-end; }
+}

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Outlook Notes & Labels",
+  "version": "0.1.0",
+  "description": "Attach private notes and emoji labels to Outlook on the web conversations.",
+  "permissions": ["storage", "contextMenus"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*",
+        "https://outlook.cloud.microsoft/*",
+        "https://outlook.live.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["editor.html", "editor.js"],
+      "matches": [
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*",
+        "https://outlook.cloud.microsoft/*",
+        "https://outlook.live.com/*"
+      ]
+    }
+  ],
+  "options_page": "options.html",
+  "action": { "default_title": "Outlook Notes & Labels: settings" }
+}
