@@ -1,8 +1,9 @@
-import baseCss from '../shared/base.css?inline';
+import tokensCss from '../shared/tokens.css?inline';
+import { icon } from '../shared/icons';
 import css from './ui.css?inline';
 import { state } from './state';
 
-const STYLE = baseCss + '\n' + css;
+const STYLE = tokensCss + '\n' + css;
 
 /** Creates an element with an open shadow root holding our styles, isolated from Outlook's CSS. */
 export function makeHost(attr: string, tag: 'span' | 'div' = 'span'): { host: HTMLElement; root: ShadowRoot } {
@@ -29,7 +30,10 @@ export function toast(text: string): void {
   const { host, root } = makeHost('data-onl-toast', 'div');
   const box = document.createElement('div');
   box.className = 'toast';
-  box.textContent = text;
+  box.setAttribute('role', 'status');
+  const span = document.createElement('span');
+  span.textContent = text;
+  box.append(icon('info16'), span);
   root.append(box);
   document.body.append(host);
   clearTimeout(toastTimer);

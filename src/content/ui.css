@@ -1,100 +1,138 @@
-:host { all: initial; font-family: var(--font); color: var(--text); }
+:host { all: initial; font-family: var(--onl-font); color: var(--onl-fg1); }
+
+/* ---------- Fluent subtle button (small) ---------- */
+.btn {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--onl-radius-m);
+  font: 400 12px/16px var(--onl-font);
+  color: var(--onl-fg2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--durationFaster, 100ms);
+}
+.btn:hover { background: var(--onl-subtle-hover); color: var(--onl-fg1); }
+.btn:hover .icon { color: var(--onl-fg-brand-hover); }
+.btn:active { background: var(--onl-subtle-pressed); }
+.btn:focus-visible { outline: 2px solid var(--onl-focus); outline-offset: -2px; }
+.btn.icon-only { width: 24px; padding: 0; }
 
 /* ---------- inbox row decoration ---------- */
 :host([data-onl-row]) {
+  /* Don't shrink: the subject (ellipsis) gives way instead, and rows.ts picks a layout that fits. */
   display: inline-flex;
   align-items: center;
-  flex: 0 1 auto;
-  min-width: 0;
-  max-width: 60%;
+  flex: 0 0 auto;
   margin-left: 6px;
   vertical-align: middle;
-  overflow: hidden;
 }
-.row { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
-.row .pill { height: 16px; line-height: 16px; font-size: 10.5px; max-width: 120px; }
-.noteicon { font-size: 12px; line-height: 1; }
-.more { font: 600 10.5px var(--font); color: var(--muted); }
+.row { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.row .noteicon { color: var(--onl-fg3); display: inline-flex; }
+.chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box;
+  min-width: 18px; height: 18px; padding: 0 3px;
+  border-radius: var(--onl-radius-m);
+  background: var(--pill-bg); color: var(--pill-fg);
+  font: 600 11px/1 var(--onl-font);
+}
+.more { font: 400 12px/16px var(--onl-font); color: var(--onl-fg3); }
 
-/* ---------- hover card ---------- */
+/* ---------- hover card (Fluent popover) ---------- */
 :host([data-onl-card]) { position: fixed; z-index: 2147483646; pointer-events: none; }
 .card {
+  box-sizing: border-box;
   width: max-content;
+  min-width: 200px;
   max-width: 340px;
-  min-width: 180px;
-  background: var(--note-bg);
-  color: var(--note-text);
-  border: 1px solid var(--note-border);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  padding: 10px 12px;
-  font: 13px/1.45 var(--font);
-  animation: fade .12s ease-out;
+  padding: 12px 16px;
+  background: var(--onl-bg1);
+  color: var(--onl-fg1);
+  border: 1px solid var(--colorTransparentStroke, transparent);
+  border-radius: var(--onl-radius-xl);
+  box-shadow: var(--onl-shadow16);
+  font: 400 14px/20px var(--onl-font);
+  animation: card-in 150ms var(--onl-ease);
 }
-.card .pills { display: flex; flex-wrap: wrap; gap: 4px; }
-.card .pills + .note { margin-top: 8px; }
+.card .caption { display: flex; align-items: center; gap: 6px; font: 600 12px/16px var(--onl-font); color: var(--onl-fg3); }
+.card .caption .icon { color: var(--onl-note-icon); }
+.card .pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .card .note {
+  margin-top: 8px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  max-height: 240px;
+  max-height: 200px;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(#000 85%, transparent);
-  mask-image: linear-gradient(#000 85%, transparent);
 }
-.card .note.short { -webkit-mask-image: none; mask-image: none; }
-@keyframes fade { from { opacity: 0; transform: translateY(-2px); } }
+.card .note.long { -webkit-mask-image: linear-gradient(#000 80%, transparent); mask-image: linear-gradient(#000 80%, transparent); }
+@keyframes card-in { from { opacity: 0; transform: translateY(-4px); } }
 
-/* ---------- reading pane banner ---------- */
+/* ---------- reading pane note (Fluent MessageBar layout) ---------- */
 :host([data-onl-banner]) { display: block; margin: 8px 16px 4px; }
-.banner {
-  background: var(--note-bg);
-  color: var(--note-text);
-  border: 1px solid var(--note-border);
-  border-left-width: 4px;
-  border-radius: 6px;
-  font: 13px/1.45 var(--font);
+.bar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 6px 6px 12px;
+  background: var(--onl-note-bg);
+  border: 1px solid var(--onl-note-border);
+  border-radius: var(--onl-radius-m);
+  font: 400 14px/20px var(--onl-font);
+  color: var(--onl-fg1);
 }
-.banner .head { display: flex; align-items: center; gap: 6px; padding: 6px 8px 6px 10px; min-height: 22px; }
-.banner .head .pills { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
-.banner .head .title { font-weight: 600; white-space: nowrap; }
-.banner .head .peek { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .8; }
-.banner .spacer { flex: 1; }
-.banner .body { padding: 0 12px 10px 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.btn {
-  all: unset;
-  cursor: pointer;
-  font: 600 12px var(--font);
-  padding: 3px 8px;
-  border-radius: 4px;
-  color: inherit;
-  white-space: nowrap;
-}
-.btn:hover { background: rgba(127, 127, 127, .18); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.btn.icon { padding: 3px 6px; }
-.btn .ic { margin-right: 5px; }
-.empty { display: flex; gap: 4px; }
-.empty .btn { color: var(--muted); font-weight: 500; }
+.bar .top { display: flex; align-items: center; gap: 8px; min-height: 24px; }
+.bar .lead { display: flex; color: var(--onl-note-icon); }
+.bar .head { flex: 1; min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.bar .title { font-weight: 600; }
+.bar .pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.bar .peek { flex: 1 1 120px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--onl-fg2); }
+.bar .indent { padding: 2px 8px 2px 28px; }
+.bar .text { padding: 2px 8px 4px 28px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bar .actions { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+.empty { display: flex; gap: 2px; margin-left: -6px; }
+.empty .btn { color: var(--onl-fg3); }
 
-/* ---------- injected Outlook context-menu items ---------- */
+/* ---------- items injected into Outlook's context menu (Fluent MenuItem) ---------- */
 :host([data-onl-menu-inner]) { display: block; }
-.menu { padding: 4px 0; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.menu { display: flex; flex-direction: column; }
 .mi {
   all: unset;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
+  gap: 4px;
   height: 32px;
-  padding: 0 12px;
-  font: 14px var(--font);
-  color: var(--text);
+  padding: 6px;
+  border-radius: var(--onl-radius-m);
+  font: 400 14px/20px var(--onl-font);
+  color: var(--onl-fg2);
   cursor: pointer;
 }
-.mi:hover, .mi:focus-visible { background: rgba(127, 127, 127, .15); }
-.mi .ic { width: 16px; text-align: center; }
+.mi .ic { display: flex; width: 20px; height: 20px; }
+.mi .label { padding: 0 2px; flex: 1; white-space: nowrap; }
+.mi:hover { background: var(--onl-bg1-hover); color: var(--onl-fg1); }
+.mi:hover .icon { color: var(--onl-fg-brand-hover); }
+.mi:active { background: var(--onl-bg1-pressed); }
+.mi:focus-visible { outline: 2px solid var(--onl-focus); outline-offset: -2px; }
+.divider { height: 1px; margin: 4px -5px; background: var(--onl-stroke2); }
 
-/* ---------- toast ---------- */
+/* ---------- toast (Fluent Toast) ---------- */
 :host([data-onl-toast]) { position: fixed; z-index: 2147483647; left: 50%; bottom: 24px; transform: translateX(-50%); }
-.toast { background: var(--text); color: var(--bg); font: 13px var(--font); padding: 8px 14px; border-radius: 6px; box-shadow: var(--shadow); }
+.toast {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: var(--onl-bg1);
+  color: var(--onl-fg1);
+  border-radius: var(--onl-radius-m);
+  box-shadow: var(--onl-shadow8);
+  font: 400 14px/20px var(--onl-font);
+  animation: card-in 150ms var(--onl-ease);
+}
+.toast .icon { color: var(--onl-brand-fg); }

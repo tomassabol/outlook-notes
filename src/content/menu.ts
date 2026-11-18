@@ -1,4 +1,5 @@
 import { h } from '../shared/dom';
+import { icon, type IconName } from '../shared/icons';
 import type { EditorFocus, Msg } from '../shared/types';
 import { openEditor } from './editor-frame';
 import { MENU_SELECTOR, rowFromTarget } from './selectors';
@@ -36,7 +37,7 @@ function inject(menu: HTMLElement, convId: string): void {
   }
   host.setAttribute('data-onl-menu', '');
   const d = dataFor(convId);
-  const item = (icon: string, text: string, focus: EditorFocus) =>
+  const item = (ic: IconName, text: string, focus: EditorFocus) =>
     h(
       'button',
       {
@@ -50,10 +51,19 @@ function inject(menu: HTMLElement, convId: string): void {
           openEditor(convId, subjectFor(convId), focus);
         }) as EventListener,
       },
-      h('span', { class: 'ic' }, icon),
-      text,
+      h('span', { class: 'ic' }, icon(ic)),
+      h('span', { class: 'label' }, text),
     );
-  setContent(root, h('div', { class: 'menu' }, item('📝', d?.n?.trim() ? 'Edit note…' : 'Add note…', 'note'), item('🏷', 'Labels…', 'labels')));
+  setContent(
+    root,
+    h(
+      'div',
+      { class: 'menu' },
+      item(d?.n?.trim() ? 'note20' : 'noteAdd20', d?.n?.trim() ? 'Edit note…' : 'Add note…', 'note'),
+      item('tag20', 'Labels…', 'labels'),
+      h('div', { class: 'divider', role: 'separator' }),
+    ),
+  );
   for (const ev of ['mousedown', 'pointerdown', 'click'] as const) host.addEventListener(ev, (e) => e.stopPropagation());
   list.prepend(host);
 }

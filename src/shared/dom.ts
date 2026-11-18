@@ -1,4 +1,4 @@
-import { textColorFor } from './store';
+import { applyPaletteVars } from './palette';
 import type { Label } from './types';
 
 type Child = Node | string | null | undefined | false;
@@ -18,16 +18,16 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Props = 
   return el;
 }
 
-export function pill(label: Label): HTMLSpanElement {
+/** A label rendered like an Outlook category tag. */
+export function pill(label: Label, small = false): HTMLSpanElement {
   const text = `${label.emoji} ${label.text}`.trim();
   const el = h(
     'span',
-    { class: 'pill', title: text },
-    label.emoji ? h('span', { class: 'emoji' }, label.emoji) : null,
+    { class: small ? 'pill small' : 'pill', title: text },
+    label.emoji ? h('span', { class: 'emoji', 'aria-hidden': label.text ? 'true' : undefined }, label.emoji) : null,
     label.text ? h('span', { class: 'txt' }, label.text) : null,
   );
-  el.style.background = label.color;
-  el.style.color = textColorFor(label.color);
+  applyPaletteVars(el, label.color);
   return el;
 }
 

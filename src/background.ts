@@ -1,4 +1,4 @@
-import { DEFAULT_LABELS, getLabels, saveLabels } from './shared/store';
+import { DEFAULT_LABELS, getLabels, migrateLabels, saveLabels } from './shared/store';
 import type { EditorFocus, Msg } from './shared/types';
 
 const OUTLOOK = [
@@ -10,11 +10,12 @@ const OUTLOOK = [
 
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install' && !(await getLabels()).length) await saveLabels(DEFAULT_LABELS);
+  if (reason === 'update') await migrateLabels();
 
   chrome.contextMenus.removeAll(() => {
     const common = { contexts: ['page', 'selection', 'link'] as ['page', 'selection', 'link'], documentUrlPatterns: OUTLOOK };
-    chrome.contextMenus.create({ id: 'onl-note', title: '📝 Add/edit note', ...common });
-    chrome.contextMenus.create({ id: 'onl-labels', title: '🏷 Labels…', ...common });
+    chrome.contextMenus.create({ id: 'onl-note', title: 'Add or edit note…', ...common });
+    chrome.contextMenus.create({ id: 'onl-labels', title: 'Labels…', ...common });
   });
 });
 

@@ -1,3 +1,4 @@
+import { PALETTE, paletteName } from './palette';
 import type { ConvData, Label } from './types';
 
 export const LABELS_KEY = 'labels';
@@ -35,10 +36,10 @@ export function hasContent(d: ConvData | undefined | null): d is ConvData {
 }
 
 export const DEFAULT_LABELS: Label[] = [
-  { id: 'urgent', emoji: '🔥', text: 'Urgent', color: '#d13438' },
-  { id: 'waiting', emoji: '⏳', text: 'Waiting', color: '#f2c94c' },
-  { id: 'followup', emoji: '📌', text: 'Follow up', color: '#0f6cbd' },
-  { id: 'invoice', emoji: '💰', text: 'Invoice', color: '#107c41' },
+  { id: 'urgent', emoji: '🔥', text: 'Urgent', color: 'Red' },
+  { id: 'waiting', emoji: '⏳', text: 'Waiting', color: 'Marigold' },
+  { id: 'followup', emoji: '📌', text: 'Follow up', color: 'Blue' },
+  { id: 'invoice', emoji: '💰', text: 'Invoice', color: 'Green' },
 ];
 
 export function newId(): string {
@@ -105,23 +106,24 @@ export function friendlyError(e: unknown): string {
   return msg;
 }
 
-/** Readable text color (dark or white) for a label background. */
-export function textColorFor(hex: string): string {
-  const m = /^#?([0-9a-f]{6})$/i.exec(hex);
-  if (!m) return '#ffffff';
-  const n = parseInt(m[1], 16);
-  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => {
-    const s = c / 255;
-    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  });
-  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return lum > 0.4 ? '#1b1a19' : '#ffffff';
+/** Converts labels saved with v0.1 hex colors to palette names. Returns true if anything changed. */
+export async function migrateLabels(): Promise<boolean> {
+  const labels = await getLabels();
+  let changed = false;
+  for (const l of labels) {
+    if (!(l.color in PALETTE)) {
+      l.color = paletteName(l.color);
+      changed = true;
+    }
+  }
+  if (changed) await saveLabels(labels);
+  return changed;
 }
 
 export function isLabel(x: unknown): x is Label {
   const l = x as Label;
   return !!l && typeof l.id === 'string' && typeof l.emoji === 'string' && typeof l.text === 'string' &&
-    typeof l.color === 'string' && /^#[0-9a-f]{6}$/i.test(l.color);
+    typeof l.color === 'string' && (l.color in PALETTE || /^#[0-9a-f]{6}$/i.test(l.color));
 }
 
 export function isConvData(x: unknown): x is ConvData {

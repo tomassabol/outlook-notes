@@ -1,0 +1,51 @@
+/*
+ * Extension pages can't inherit Outlook's tokens. Light values are the alias fallbacks in
+ * tokens.css; this sets Fluent's dark theme when the page is dark and Outlook didn't send its
+ * own tokens (the editor gets live tokens from the Outlook tab; the options page never does).
+ */
+:root[data-theme="dark"]:not([data-tokens]) {
+  --colorNeutralForeground1: #ffffff;
+  --colorNeutralForeground2: #d6d6d6;
+  --colorNeutralForeground3: #adadad;
+  --colorNeutralForeground4: #999999;
+  --colorNeutralForegroundDisabled: #5c5c5c;
+  --colorNeutralForegroundOnBrand: #ffffff;
+  --colorNeutralForeground2BrandHover: #479ef5;
+  --colorBrandForeground1: #479ef5;
+  --colorBrandForegroundLink: #479ef5;
+  --colorNeutralBackground1: #292929;
+  --colorNeutralBackground1Hover: #3d3d3d;
+  --colorNeutralBackground1Pressed: #1f1f1f;
+  --colorNeutralBackground1Selected: #383838;
+  --colorNeutralBackground2: #1f1f1f;
+  --colorNeutralBackground3: #141414;
+  --colorSubtleBackgroundHover: #383838;
+  --colorSubtleBackgroundPressed: #2e2e2e;
+  --colorNeutralStroke1: #666666;
+  --colorNeutralStroke1Hover: #757575;
+  --colorNeutralStroke2: #525252;
+  --colorNeutralStrokeAccessible: #adadad;
+  --colorBrandBackground: #115ea3;
+  --colorBrandBackgroundHover: #0f6cbd;
+  --colorBrandBackgroundPressed: #0c3b5e;
+  --colorBrandBackground2: #082338;
+  --colorCompoundBrandStroke: #479ef5;
+  --colorStrokeFocus2: #ffffff;
+  --colorBackgroundOverlay: rgba(0, 0, 0, 0.5);
+  --colorPaletteMarigoldBackground1: #251a00;
+  --colorPaletteMarigoldBorder1: #835b00;
+  --colorPaletteMarigoldBorder2: #f2c661;
+  --colorPaletteMarigoldForeground1: #f2c661;
+  --colorPaletteRedForeground1: #e37d80;
+  --shadow4: 0 0 2px rgba(0,0,0,0.24), 0 2px 4px rgba(0,0,0,0.28);
+  --shadow8: 0 0 2px rgba(0,0,0,0.24), 0 4px 8px rgba(0,0,0,0.28);
+  --shadow16: 0 0 2px rgba(0,0,0,0.24), 0 8px 16px rgba(0,0,0,0.28);
+  --shadow64: 0 0 8px rgba(0,0,0,0.24), 0 32px 64px rgba(0,0,0,0.28);
+}
+/* Dark category pills, derived from the accent (Fluent's dark palette is darker tints). */
+:root[data-theme="dark"]:not([data-tokens]) .pill,
+:root[data-theme="dark"]:not([data-tokens]) .swatch,
+:root[data-theme="dark"]:not([data-tokens]) .tag {
+  --pill-bg: color-mix(in srgb, var(--pal-accent) 38%, #1f1f1f);
+  --pill-fg: color-mix(in srgb, var(--pal-accent) 35%, #ffffff);
+}

@@ -1,5 +1,6 @@
 import { hasContent } from '../shared/store';
 import { h, pill } from '../shared/dom';
+import { icon } from '../shared/icons';
 import { rowFromTarget } from './selectors';
 import { dataFor, labelsOf } from './state';
 import { makeHost, setContent } from './ui';
@@ -28,8 +29,9 @@ function show(row: HTMLElement, convId: string): void {
     h(
       'div',
       { class: 'card', role: 'tooltip' },
-      labels.length ? h('div', { class: 'pills' }, ...labels.map(pill)) : null,
-      note ? h('div', { class: `note${note.length < 400 ? ' short' : ''}` }, note) : null,
+      h('div', { class: 'caption' }, icon(note ? 'note16' : 'tag16'), note ? 'Note' : 'Labels'),
+      labels.length ? h('div', { class: 'pills' }, ...labels.map((l) => pill(l))) : null,
+      note ? h('div', { class: `note${note.length > 360 || note.split('\n').length > 9 ? ' long' : ''}` }, note) : null,
     ),
   );
   host.style.visibility = 'hidden';

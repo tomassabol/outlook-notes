@@ -1,5 +1,6 @@
 import { hasContent } from '../shared/store';
 import { h, pill } from '../shared/dom';
+import { icon, type IconName } from '../shared/icons';
 import type { EditorFocus } from '../shared/types';
 import { openEditor } from './editor-frame';
 import { findBannerAnchor, findReadingPane } from './selectors';
@@ -16,7 +17,16 @@ export async function initBanner(): Promise<void> {
   collapsed = !!r[COLLAPSE_KEY];
 }
 
-/** Shows the sticky-note banner for the open conversation; removes it when nothing is open. */
+function button(text: string, ic: IconName, title: string, onClick: () => void, iconOnly = false): HTMLButtonElement {
+  return h(
+    'button',
+    { class: iconOnly ? 'btn icon-only' : 'btn', type: 'button', title, 'aria-label': title, onclick: onClick as EventListener },
+    icon(ic),
+    iconOnly ? null : text,
+  );
+}
+
+/** Shows the note bar for the open conversation; removes it when nothing is open. */
 export function updateBanner(): void {
   const convId = currentOpenConvId();
   const pane = convId ? findReadingPane() : null;
@@ -33,7 +43,7 @@ export function updateBanner(): void {
   if (!host || host.previousElementSibling !== anchor) {
     host?.remove();
     host = makeHost(ATTR, 'div').host;
-    // Clicks inside the banner shouldn't reach Outlook's reading-pane handlers.
+    // Clicks inside the bar shouldn't reach Outlook's reading-pane handlers.
     for (const ev of ['click', 'mousedown', 'dblclick'] as const) host.addEventListener(ev, (e) => e.stopPropagation());
     anchor.after(host);
   }
@@ -41,36 +51,52 @@ export function updateBanner(): void {
   host.dataset.theme = state.theme;
 
   const edit = (focus: EditorFocus) => () => openEditor(convId, subjectFor(convId), focus);
-  const btn = (text: string, title: string, onClick: () => void, cls = 'btn', icon = '') =>
-    h('button', { class: cls, type: 'button', title, onclick: onClick as EventListener }, icon ? h('span', { class: 'ic' }, icon) : null, text);
 
   if (!hasContent(d)) {
     setContent(
       host.shadowRoot!,
-      h('div', { class: 'empty' }, btn('Add note', 'Add a private note', edit('note'), 'btn', '📝'), btn('Add label', 'Add labels', edit('labels'), 'btn', '🏷')),
+      h(
+        'div',
+        { class: 'empty' },
+        button('Add note', 'noteAdd16', 'Add a private note', edit('note')),
+        button('Add label', 'tag16', 'Add labels', edit('labels')),
+      ),
     );
     return;
   }
 
   const labels = labelsOf(d);
   const note = d.n?.trim() ?? '';
+  const isCollapsed = collapsed && !!note;
   const toggle = () => {
     collapsed = !collapsed;
     void chrome.storage.local.set({ [COLLAPSE_KEY]: collapsed });
     updateBanner();
   };
+
+  const labelPills = labels.length ? h('span', { class: 'pills' }, ...labels.map((l) => pill(l))) : null;
   const head = h(
     'div',
     { class: 'head' },
-    note ? h('span', { class: 'title' }, '📝') : null,
-    labels.length ? h('span', { class: 'pills' }, ...labels.map(pill)) : null,
-    collapsed && note ? h('span', { class: 'peek' }, note.split('\n')[0]) : h('span', { class: 'spacer' }),
-    btn(note ? 'Edit note' : 'Add note', 'Edit note', edit('note')),
-    btn('Labels', 'Edit labels', edit('labels'), 'btn', '🏷'),
-    note ? btn(collapsed ? '▸' : '▾', collapsed ? 'Expand note' : 'Collapse note', toggle, 'btn icon') : null,
+    note ? h('span', { class: 'title' }, 'Note') : labelPills,
+    isCollapsed ? h('span', { class: 'peek' }, note.split('\n')[0]) : null,
   );
+  const actions = h(
+    'div',
+    { class: 'actions' },
+    button(note ? 'Edit' : 'Add note', note ? 'edit16' : 'noteAdd16', note ? 'Edit note' : 'Add note', edit('note')),
+    button('Labels', 'tag16', 'Edit labels', edit('labels')),
+    note ? button('', isCollapsed ? 'chevronDown16' : 'chevronUp16', isCollapsed ? 'Expand note' : 'Collapse note', toggle, true) : null,
+  );
+
   setContent(
     host.shadowRoot!,
-    h('div', { class: 'banner', role: 'note', 'aria-label': 'Your note' }, head, !collapsed && note ? h('div', { class: 'body' }, note) : null),
+    h(
+      'div',
+      { class: 'bar', role: 'note', 'aria-label': 'Your note' },
+      h('div', { class: 'top' }, h('span', { class: 'lead' }, icon(note ? 'note20' : 'tag20')), head, actions),
+      note && labelPills ? h('div', { class: 'indent' }, labelPills) : null,
+      note && !isCollapsed ? h('div', { class: 'text' }, note) : null,
+    ),
   );
 }

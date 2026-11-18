@@ -1,0 +1,76 @@
+/*
+ * Alias layer over Outlook's Fluent UI v9 design tokens. Inside Outlook these resolve to the
+ * live theme (light, dark or custom); the fallbacks are Fluent's light theme. Components only
+ * use the --onl-* names.
+ */
+:host, :root {
+  --onl-font: var(--fontFamilyBase, 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif);
+  --onl-fg1: var(--colorNeutralForeground1, #242424);
+  --onl-fg2: var(--colorNeutralForeground2, #424242);
+  --onl-fg3: var(--colorNeutralForeground3, #616161);
+  --onl-fg4: var(--colorNeutralForeground4, #707070);
+  --onl-fg-disabled: var(--colorNeutralForegroundDisabled, #bdbdbd);
+  --onl-fg-on-brand: var(--colorNeutralForegroundOnBrand, #ffffff);
+  --onl-fg-brand-hover: var(--colorNeutralForeground2BrandHover, #0f6cbd);
+  --onl-brand-fg: var(--colorBrandForeground1, #0f6cbd);
+  --onl-brand-link: var(--colorBrandForegroundLink, #115ea3);
+  --onl-bg1: var(--colorNeutralBackground1, #ffffff);
+  --onl-bg1-hover: var(--colorNeutralBackground1Hover, #f5f5f5);
+  --onl-bg1-pressed: var(--colorNeutralBackground1Pressed, #e0e0e0);
+  --onl-bg1-selected: var(--colorNeutralBackground1Selected, #ebebeb);
+  --onl-bg2: var(--colorNeutralBackground2, #fafafa);
+  --onl-bg3: var(--colorNeutralBackground3, #f5f5f5);
+  --onl-subtle-hover: var(--colorSubtleBackgroundHover, #f5f5f5);
+  --onl-subtle-pressed: var(--colorSubtleBackgroundPressed, #e0e0e0);
+  --onl-stroke1: var(--colorNeutralStroke1, #d1d1d1);
+  --onl-stroke1-hover: var(--colorNeutralStroke1Hover, #c7c7c7);
+  --onl-stroke2: var(--colorNeutralStroke2, #e0e0e0);
+  --onl-stroke-accessible: var(--colorNeutralStrokeAccessible, #616161);
+  --onl-brand-bg: var(--colorBrandBackground, #0f6cbd);
+  --onl-brand-bg-hover: var(--colorBrandBackgroundHover, #115ea3);
+  --onl-brand-bg-pressed: var(--colorBrandBackgroundPressed, #0c3b5e);
+  --onl-brand-bg2: var(--colorBrandBackground2, #ebf3fc);
+  --onl-brand-stroke: var(--colorCompoundBrandStroke, #0f6cbd);
+  --onl-focus: var(--colorStrokeFocus2, #000000);
+  --onl-overlay: var(--colorBackgroundOverlay, rgba(0, 0, 0, 0.4));
+  --onl-note-bg: var(--colorPaletteMarigoldBackground1, #fefbf4);
+  --onl-note-border: var(--colorPaletteMarigoldBorder1, #f9e2ae);
+  --onl-note-accent: var(--colorPaletteMarigoldBorder2, #eaa300);
+  --onl-note-icon: var(--colorPaletteMarigoldForeground1, #d39300);
+  --onl-danger: var(--colorPaletteRedForeground1, #bc2f32);
+  --onl-shadow4: var(--shadow4, 0 0 2px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.14));
+  --onl-shadow8: var(--shadow8, 0 0 2px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.14));
+  --onl-shadow16: var(--shadow16, 0 0 2px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.14));
+  --onl-shadow64: var(--shadow64, 0 0 8px rgba(0,0,0,0.12), 0 32px 64px rgba(0,0,0,0.14));
+  --onl-radius-s: var(--borderRadiusSmall, 2px);
+  --onl-radius-m: var(--borderRadiusMedium, 4px);
+  --onl-radius-l: var(--borderRadiusLarge, 6px);
+  --onl-radius-xl: var(--borderRadiusXLarge, 8px);
+  --onl-ease: var(--curveDecelerateMid, cubic-bezier(0, 0, 0, 1));
+}
+
+/* ----- category-style label pill ----- */
+/* --pal-* are set inline per color; --pill-* can be overridden by theme rules (see fluent-fallback.css). */
+.pill, .swatch, .tag, .chip { --pill-bg: var(--pal-bg); --pill-fg: var(--pal-fg); --pill-accent: var(--pal-accent); }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  max-width: 180px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--onl-radius-m);
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  font: 400 12px/16px var(--onl-font);
+  white-space: nowrap;
+  vertical-align: middle;
+  flex: 0 0 auto;
+}
+.pill .emoji { font-size: 12px; line-height: 1; }
+.pill .txt { overflow: hidden; text-overflow: ellipsis; }
+.pill.small { height: 18px; padding: 0 5px; font-size: 11px; gap: 3px; }
+
+/* ----- Fluent icons ----- */
+.icon { display: inline-block; flex: 0 0 auto; fill: currentColor; vertical-align: middle; }

@@ -2,11 +2,11 @@
 
 A Chrome extension for Outlook on the web that adds private notes and emoji labels to email conversations.
 
-- **📝 Notes:** plain text, one per conversation. A 📝 icon marks noted emails in the list.
+- **Notes:** plain text, one per conversation. A note icon marks noted emails in the list.
 - **Hover card:** rest the pointer on a noted email in the list for about 0.4 s to read its note and labels.
 - **Banner:** an open email shows its note and labels in a yellow strip under the subject. It can be collapsed.
-- **🏷 Labels:** a reusable set of emoji + text + color labels, shown as pills next to the subject.
-- **Editing:** the banner buttons, or right-click an email in the list for **📝 Add note…** / **🏷 Labels…**.
+- **Labels:** a reusable set of labels (emoji + text + one of Outlook's category colors), shown as category-style tags next to the subject.
+- **Editing:** the buttons on the note bar, or right-click an email in the list for **Add note…** / **Labels…**.
 - **Options page:** click the toolbar icon to manage labels, browse or search all notes, check storage use, and export or import JSON.
 
 Works on `outlook.office.com`, `outlook.office365.com`, `outlook.cloud.microsoft` (work/school) and `outlook.live.com` (personal).
@@ -24,6 +24,16 @@ npm run build
 4. Reload any open Outlook tabs.
 
 While developing, `npm run watch` rebuilds on save. After a rebuild, click the reload icon on the extension card, then reload Outlook.
+
+## Look and feel
+
+The UI is built to blend into Outlook:
+
+- Styles use Outlook's own Fluent UI v9 design tokens (`--colorNeutralForeground1`, `--shadow16`, …), read live from the page. That means light, dark and custom Outlook themes are matched automatically. The alias layer is in [`src/shared/tokens.css`](src/shared/tokens.css).
+- Label colors are Outlook's category palette (`--colorPalette<Name>Background2/Foreground2`).
+- Icons are Microsoft's [Fluent System Icons](https://github.com/microsoft/fluentui-system-icons), the set Outlook uses.
+- Components follow their Fluent counterparts: the note bar is a MessageBar, the hover card is a Popover, the editor is a Dialog, and the right-click items are MenuItems.
+- The editor iframe can't inherit Outlook's CSS variables, so the content script sends it the current token values when it opens.
 
 ## Data & privacy
 

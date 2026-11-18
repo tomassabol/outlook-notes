@@ -2,7 +2,7 @@ export interface Label {
   id: string;
   emoji: string;
   text: string;
-  /** #rrggbb */
+  /** Outlook category palette name, e.g. "Red" (legacy: #rrggbb, mapped to the nearest) */
   color: string;
 }
 
@@ -30,18 +30,5 @@ export type Theme = 'light' | 'dark';
 export type EditorFocus = 'note' | 'labels';
 
 export type Msg = { type: 'open-editor'; focus: EditorFocus };
-
-export const LABEL_COLORS = [
-  '#d13438', // red
-  '#ca5010', // orange
-  '#f2c94c', // yellow
-  '#107c41', // green
-  '#038387', // teal
-  '#0f6cbd', // blue
-  '#8764b8', // purple
-  '#e3008c', // pink
-  '#8e562e', // brown
-  '#69797e', // gray
-];
 
 export const QUICK_EMOJI = ['🔥', '⭐', '✅', '⏳', '📌', '💰', '❗', '💬', '👀', '🗓️', '🚀', '🤝'];

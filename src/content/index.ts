@@ -25,7 +25,7 @@ function run(): void {
   if (!chrome.runtime?.id) return observer.disconnect();
   try {
     state.theme = detectTheme();
-    decorateRows();
+    decorateRows(schedule);
     updateBanner();
   } catch (e) {
     console.warn('[outlook-notes]', e);
