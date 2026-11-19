@@ -2,7 +2,7 @@ import tokensCss from '../shared/tokens.css?inline';
 import fallbackCss from './fluent-fallback.css?inline';
 import pageCss from './page.css?inline';
 import css from './editor.css?inline';
-import { h, injectStyle, pill } from '../shared/dom';
+import { FIELD_NAMES, h, injectStyle, pill } from '../shared/dom';
 import { icon } from '../shared/icons';
 import { PALETTE_NAMES, applyPaletteVars, paletteTitle } from '../shared/palette';
 import { convKey, friendlyError, getConv, getLabels, newId, saveConv, saveLabels } from '../shared/store';
@@ -45,6 +45,10 @@ async function main(): Promise<void> {
 
   const textarea = h('textarea', { id: 'note', class: 'input note', rows: 6, placeholder: 'Write a private note…', spellcheck: true });
   textarea.value = data?.n ?? '';
+  const bNumberInput = h('input', { id: 'bnumber', class: 'input', maxlength: 40, placeholder: 'B12345', autocomplete: 'off', spellcheck: false });
+  const workOrderInput = h('input', { id: 'workorder', class: 'input', maxlength: 40, placeholder: 'WO-12345', autocomplete: 'off', spellcheck: false });
+  bNumberInput.value = data?.b ?? '';
+  workOrderInput.value = data?.w ?? '';
   const tags = h('div', { class: 'tags', role: 'group', 'aria-labelledby': 'labels-label' });
   const error = h('p', { class: 'error', role: 'alert', hidden: true });
   const showError = (e: unknown) => {
@@ -72,7 +76,6 @@ async function main(): Promise<void> {
           },
         },
         h('span', { class: 'check' }, icon('checkmark12')),
-        h('span', { class: 'dot', 'aria-hidden': 'true' }),
         l.emoji ? h('span', { 'aria-hidden': 'true' }, l.emoji) : null,
         l.text,
       );
@@ -185,6 +188,10 @@ async function main(): Promise<void> {
     const l = labels.filter((x) => selected.has(x.id)).map((x) => x.id);
     const next: ConvData = { s: (subject || data?.s || '').slice(0, 60), u: Date.now() };
     if (n.trim()) next.n = n;
+    const b = bNumberInput.value.trim();
+    const w = workOrderInput.value.trim();
+    if (b) next.b = b;
+    if (w) next.w = w;
     if (l.length) next.l = l;
     try {
       await saveConv(key, next);
@@ -206,7 +213,7 @@ async function main(): Promise<void> {
 
   const dialog = h(
     'div',
-    { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'title', 'aria-describedby': 'subject' },
+    { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'title', 'aria-describedby': 'subject', tabindex: '-1' },
     h(
       'header',
       {},
@@ -216,6 +223,12 @@ async function main(): Promise<void> {
     h(
       'div',
       { class: 'body' },
+      h(
+        'div',
+        { class: 'ids' },
+        h('div', {}, h('label', { class: 'field-label', for: 'bnumber' }, FIELD_NAMES.b), bNumberInput),
+        h('div', {}, h('label', { class: 'field-label', for: 'workorder' }, FIELD_NAMES.w), workOrderInput),
+      ),
       h('div', {}, h('label', { class: 'field-label', for: 'note' }, 'Note'), textarea),
       h(
         'div',
@@ -259,7 +272,9 @@ async function main(): Promise<void> {
   // Hidden elements can't take focus, so wait until the themed dialog is shown.
   await revealed;
   window.focus();
-  if (focus === 'labels') ((tags.querySelector('.tag') as HTMLElement | null) ?? newBtn).focus();
+  // For labels, focus the dialog rather than the first tag: a programmatic focus would draw a
+  // focus ring on that tag. Tab still moves through the tags from here.
+  if (focus === 'labels') dialog.focus();
   else {
     textarea.focus();
     textarea.setSelectionRange(textarea.value.length, textarea.value.length);

@@ -2,7 +2,7 @@ import tokensCss from '../shared/tokens.css?inline';
 import fallbackCss from './fluent-fallback.css?inline';
 import pageCss from './page.css?inline';
 import css from './options.css?inline';
-import { h, injectStyle, pill } from '../shared/dom';
+import { FIELD_NAMES, fieldBox, h, injectStyle, pill } from '../shared/dom';
 import { icon } from '../shared/icons';
 import { PALETTE_NAMES, applyPaletteVars, paletteName, paletteTitle } from '../shared/palette';
 import {
@@ -68,7 +68,7 @@ document.body.append(
         h('input', {
           class: 'input',
           type: 'search',
-          placeholder: 'Search subjects, notes and labels',
+          placeholder: 'Search subjects, notes, labels, B numbers and work orders',
           'aria-label': 'Search notes',
           oninput: ((e: Event) => {
             query = (e.target as HTMLInputElement).value.toLowerCase();
@@ -225,7 +225,7 @@ function renderNotes(): void {
   const matches = entries.filter(([, d]) => {
     if (!query) return true;
     const ls = (d.l ?? []).map((id) => byId.get(id)).map((l) => (l ? `${l.emoji} ${l.text}` : '')).join(' ');
-    return `${d.s} ${d.n ?? ''} ${ls}`.toLowerCase().includes(query);
+    return `${d.s} ${d.n ?? ''} ${d.b ?? ''} ${d.w ?? ''} ${ls}`.toLowerCase().includes(query);
   });
   notesList.replaceChildren(
     ...matches.map(([key, d]) => {
@@ -244,6 +244,9 @@ function renderNotes(): void {
             h('span', { class: 'caption' }, new Date(d.u).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })),
           ),
           ls.length ? h('div', { class: 'pills' }, ...ls.map((l) => pill(l))) : null,
+          d.b?.trim() || d.w?.trim()
+            ? h('div', { class: 'fields' }, d.b?.trim() ? fieldBox(d.b.trim(), FIELD_NAMES.b) : null, d.w?.trim() ? fieldBox(d.w.trim(), FIELD_NAMES.w) : null)
+            : null,
           d.n ? h('div', { class: 'text' }, d.n) : null,
         ),
         h(

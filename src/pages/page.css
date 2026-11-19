@@ -76,20 +76,22 @@ textarea.input { height: auto; padding: 6px 10px; resize: vertical; line-height:
 .swatch[aria-checked="true"] { box-shadow: 0 0 0 2px var(--onl-bg1), 0 0 0 4px var(--onl-fg1); }
 .swatch[aria-checked="true"] .icon { visibility: visible; }
 
-/* Interactive category tag (toggle) */
+/* Interactive category tag (toggle). Always fully in the label's color, emoji inside;
+   selected = checkmark + thin accent-colored line. */
 .tag {
   display: inline-flex; align-items: center; gap: 6px;
-  height: 28px; padding: 0 10px 0 8px;
-  border: 1px solid var(--onl-stroke1); border-radius: var(--onl-radius-m);
-  background: var(--onl-bg1); color: var(--onl-fg1);
+  height: 28px; padding: 0 10px;
+  border: 0; border-radius: var(--onl-radius-m);
+  background: var(--pill-bg); color: var(--pill-fg);
   font: 400 14px/20px var(--onl-font);
   cursor: pointer;
+  transition: filter var(--durationFaster, 100ms), box-shadow var(--durationFaster, 100ms);
 }
-.tag:hover { background: var(--onl-bg1-hover); }
-.tag .dot { width: 12px; height: 12px; border-radius: 3px; background: var(--pill-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-fg) 30%, transparent); }
-.tag .check { width: 12px; display: inline-flex; }
-.tag[aria-pressed="true"] { background: var(--pill-bg); color: var(--pill-fg); border-color: transparent; }
-.tag[aria-pressed="true"] .dot { display: none; }
+.tag:hover { filter: brightness(0.96); }
+.tag .check { display: inline-flex; width: 12px; }
 .tag[aria-pressed="false"] .check { display: none; }
+/* Selected: a thin line in the label's own accent color (inset, so nothing shifts). */
+.tag[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--pill-accent); }
+
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

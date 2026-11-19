@@ -3,7 +3,8 @@
 A Chrome extension for Outlook on the web that adds private notes and emoji labels to email conversations.
 
 - **Notes:** plain text, one per conversation. A note icon marks noted emails in the list.
-- **Hover card:** rest the pointer on a noted email in the list for about 0.4 s to read its note and labels.
+- **B number & work order:** two optional fields per conversation (e.g. `B12345`, `WO-12345`), shown as boxed values only when filled in.
+- **Hover card:** rest the pointer on a noted email for about 0.4 s. It shows labels, B number, work order, then the note. Click a label or box to copy its text (labels copy without the emoji); click anywhere else on the card to edit. Text can be drag-selected and copied.
 - **Banner:** an open email shows its note and labels in a yellow strip under the subject. It can be collapsed.
 - **Labels:** a reusable set of labels (emoji + text + one of Outlook's category colors), shown as category-style tags next to the subject.
 - **Editing:** the buttons on the note bar, or right-click an email in the list for **Add note…** / **Labels…**.
@@ -14,8 +15,8 @@ Works on `outlook.office.com`, `outlook.office365.com`, `outlook.cloud.microsoft
 ## Install (developer mode)
 
 ```bash
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 1. Open `chrome://extensions`.
@@ -23,7 +24,15 @@ npm run build
 3. Click **Load unpacked** and pick the `dist/` folder.
 4. Reload any open Outlook tabs.
 
-While developing, `npm run watch` rebuilds on save. After a rebuild, click the reload icon on the extension card, then reload Outlook.
+While developing, `bun run watch` rebuilds on save. After a rebuild, click the reload icon on the extension card, then reload Outlook.
+
+## Mock Outlook (local dev)
+
+```bash
+bun run dev
+```
+
+This serves a fake Outlook inbox at http://localhost:8791 (`/?dark` for the dark theme, `/options.html` for the options page). It loads the real built extension from `dist/` with an in-memory `chrome.storage` stub kept in `localStorage`, and rebuilds on save, so you can try changes without reloading the extension. The mock lives in [`dev/mock/`](dev/mock) and the server in [`dev/server.ts`](dev/server.ts). Its DOM mirrors the Outlook attributes the extension relies on (see *How it finds emails*).
 
 ## Look and feel
 

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Mock Outlook</title>
+<style>
+  body { margin: 0; font: 14px "Segoe UI", system-ui, sans-serif; background: #fff; color: #242424; }
+  body.dark { background: #1f1f1f; color: #eee; }
+  #app { display: flex; height: 100vh; }
+  [role=main] { display: flex; flex: 1; background: inherit; }
+  [role=listbox] { width: 380px; border-right: 1px solid #ddd; overflow: auto; }
+  [role=option] { padding: 8px 12px; border-bottom: 1px solid #eee; cursor: default; }
+  [role=option][aria-selected=true] { background: #cfe4fa; }
+  body.dark [role=option][aria-selected=true] { background: #2b3a4a; }
+  .l1, .l2 { display: flex; gap: 8px; white-space: nowrap; overflow: hidden; }
+  .l1 .from { font-weight: 600; flex: 1; }
+  .l2 span { overflow: hidden; text-overflow: ellipsis; }
+  .l3 { color: #777; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #ReadingPaneContainerId { flex: 1; padding: 16px 0; }
+  .subjline { padding: 0 16px; font-size: 20px; font-weight: 600; }
+  .body { padding: 16px; }
+  [role=menu] { position: fixed; margin: 0; padding: 4px; background: #fff; box-shadow: 0 0 2px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.14); border-radius: 4px; width: 200px; font: 14px/20px 'Segoe UI', system-ui, sans-serif; color: #424242 }
+  [role=menu] [role=menuitem] { display: flex; align-items: center; height: 32px; padding: 6px 6px 6px 34px; box-sizing: border-box; border-radius: 4px; }
+  [role=menu] [role=menuitem]:hover { background: #f0f0f0; }
+</style><style id="fluent">:root{--fontFamilyBase:'Segoe UI',-apple-system,sans-serif;--colorNeutralForeground1:#242424;--colorNeutralForeground2:#424242;--colorNeutralForeground3:#616161;--colorNeutralBackground1:#ffffff;--colorNeutralBackground1Hover:#f5f5f5;--colorNeutralBackground3:#f5f5f5;--colorSubtleBackgroundHover:#f5f5f5;--colorNeutralStroke2:#e0e0e0;--colorPaletteMarigoldBackground1:#fefbf4;--colorPaletteMarigoldBorder1:#f9e2ae;--colorPaletteMarigoldForeground1:#d39300;--colorNeutralForeground2BrandHover:#0f6cbd;--colorPaletteRedBackground2:#f1bbbc;--colorPaletteRedForeground2:#751d1f;--colorPaletteRedBorderActive:#d13438;--colorPaletteMarigoldBackground2:#f9e2ae;--colorPaletteMarigoldForeground2:#835b00;--colorPaletteMarigoldBorderActive:#eaa300;--colorPaletteBlueBackground2:#a9d3f2;--colorPaletteBlueForeground2:#004377;--colorPaletteBlueBorderActive:#0078d4;--colorPaletteGreenBackground2:#9fd89f;--colorPaletteGreenForeground2:#094509;--colorPaletteGreenBorderActive:#107c10;}html.dark{
+  --colorNeutralForeground1: #ffffff;
+  --colorNeutralForeground2: #d6d6d6;
+  --colorNeutralForeground3: #adadad;
+  --colorNeutralForeground4: #999999;
+  --colorNeutralForegroundDisabled: #5c5c5c;
+  --colorNeutralForegroundOnBrand: #ffffff;
+  --colorNeutralForeground2BrandHover: #479ef5;
+  --colorBrandForeground1: #479ef5;
+  --colorBrandForegroundLink: #479ef5;
+  --colorNeutralBackground1: #292929;
+  --colorNeutralBackground1Hover: #3d3d3d;
+  --colorNeutralBackground1Pressed: #1f1f1f;
+  --colorNeutralBackground1Selected: #383838;
+  --colorNeutralBackground2: #1f1f1f;
+  --colorNeutralBackground3: #141414;
+  --colorSubtleBackgroundHover: #383838;
+  --colorSubtleBackgroundPressed: #2e2e2e;
+  --colorNeutralStroke1: #666666;
+  --colorNeutralStroke1Hover: #757575;
+  --colorNeutralStroke2: #525252;
+  --colorNeutralStrokeAccessible: #adadad;
+  --colorBrandBackground: #115ea3;
+  --colorBrandBackgroundHover: #0f6cbd;
+  --colorBrandBackgroundPressed: #0c3b5e;
+  --colorBrandBackground2: #082338;
+  --colorCompoundBrandStroke: #479ef5;
+  --colorStrokeFocus2: #ffffff;
+  --colorBackgroundOverlay: rgba(0, 0, 0, 0.5);
+  --colorPaletteMarigoldBackground1: #251a00;
+  --colorPaletteMarigoldBorder1: #835b00;
+  --colorPaletteMarigoldBorder2: #f2c661;
+  --colorPaletteMarigoldForeground1: #f2c661;
+  --colorPaletteRedForeground1: #e37d80;
+  --shadow4: 0 0 2px rgba(0,0,0,0.24), 0 2px 4px rgba(0,0,0,0.28);
+  --shadow8: 0 0 2px rgba(0,0,0,0.24), 0 4px 8px rgba(0,0,0,0.28);
+  --shadow16: 0 0 2px rgba(0,0,0,0.24), 0 8px 16px rgba(0,0,0,0.28);
+  --shadow64: 0 0 8px rgba(0,0,0,0.24), 0 32px 64px rgba(0,0,0,0.28);
+--colorPaletteRedBackground2:#6e0811;--colorPaletteRedForeground2:#eeacb2;--colorPaletteMarigoldBackground2:#4a3400;--colorPaletteMarigoldForeground2:#f9e2ae;--colorPaletteBlueBackground2:#004377;--colorPaletteBlueForeground2:#a9d3f2;--colorPaletteGreenBackground2:#094509;--colorPaletteGreenForeground2:#9fd89f;}html.dark body{background:#1f1f1f;color:#fff} html.dark [role=listbox]{background:#292929;border-color:#3d3d3d} html.dark [role=option]{border-color:#3d3d3d} html.dark [role=option][aria-selected=true]{background:#0c3b5e} html.dark #ReadingPaneContainerId{background:#292929} html.dark [role=menu]{background:#292929;color:#fff}</style><script>if(location.search.includes("dark"))document.documentElement.classList.add("dark")</script></head>
+<body>
+<div id="app"><div role="main">
+  <div role="listbox" aria-label="Message list"></div>
+  <div id="ReadingPaneContainerId"></div>
+</div></div>
+<script>
+const mails = [
+  ['AAQkADc1-invoice', 'Alice Smith', 'alice@example.com', 'Q4 invoice for review', 'Hi, please find the Q4 invoice attached…', '10:42 AM'],
+  ['AAQkADc2-offsite', 'Bob Jones', 'bob@example.com', 'Team offsite planning', 'Let’s lock the venue by Friday…', '9:15 AM'],
+  ['AAQkADc3-contract', 'Carol White', 'carol@example.com', 'Contract renewal – action needed', 'The current contract ends on…', 'Mon 11/16'],
+  ['AAQkADc4-news', 'Newsletter', 'news@example.com', 'Your weekly digest', 'Top stories this week…', 'Sun 11/15'],
+];
+const list = document.querySelector('[role=listbox]');
+const pane = document.getElementById('ReadingPaneContainerId');
+for (const [id, from, email, subj, prev, time] of mails) {
+  const row = document.createElement('div');
+  row.setAttribute('role', 'option'); row.setAttribute('aria-selected', 'false'); row.dataset.convid = id; row.tabIndex = 0;
+  row.setAttribute('aria-label', `${email} ${subj} ${time} ${prev}`);
+  row.innerHTML = `<div class="l1"><span class="from" title="${email}">${from}</span><span title="${time}">${time}</span></div>
+    <div class="l2"><div style="display:flex;overflow:hidden;min-width:0"><span style="overflow:hidden;text-overflow:ellipsis">${subj}</span></div><span title="Full date">${time}</span></div><div class="l3">${prev}</div>`;
+  row.addEventListener('click', () => {
+    list.querySelectorAll('[role=option]').forEach((r) => r.setAttribute('aria-selected', String(r === row)));
+    history.pushState({}, '', `/mail/inbox/id/${id}-item`);
+    pane.innerHTML = `<div id="ConversationReadingPaneContainer" style="display:flex;flex-direction:column"><div><div class="subjline" style="display:flex"><div><span role="heading" aria-level="3" id="CONV_${id}_SUBJECT">${subj}</span></div><div>⋯</div></div></div><div class="body">From ${from}<br><br>${prev}</div></div>`;
+  });
+  row.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    document.querySelector('[role=menu]')?.remove();
+    setTimeout(() => {
+      const m = document.createElement('div'); m.setAttribute('role', 'menu'); m.className = 'menu';
+      m.style.left = e.clientX + 'px'; m.style.top = e.clientY + 'px';
+      m.innerHTML = '<div role="menuitem">Reply</div><div role="menuitem">Delete</div>';
+      document.body.append(m);
+    }, 30);
+  });
+  list.append(row);
+}
+window.closeEmail = () => { history.pushState({}, '', '/'); pane.innerHTML = ''; };
+const closeMenu = () => document.querySelector('[role=menu]')?.remove();
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); window.lastOutlookKey = e.key; });
+document.addEventListener('mousedown', (e) => { if (!e.target.closest?.('[role=menu]')) closeMenu(); });
+</script>
+<script src="/chrome-stub.js"></script>
+<script src="/content.js"></script>
+</body></html>

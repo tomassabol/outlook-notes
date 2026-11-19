@@ -18,12 +18,16 @@ html:not(.ready) body { visibility: hidden; }
   box-shadow: var(--onl-shadow64);
   animation: pop 250ms var(--onl-ease);
 }
+.dialog:focus { outline: none; }
 .dialog header { display: flex; align-items: flex-start; gap: 8px; padding: 24px 24px 0; }
 .dialog header .titles { flex: 1; min-width: 0; }
 h1 { font: 600 20px/28px var(--onl-font); margin: 0; }
 .subject { margin: 2px 0 0; color: var(--onl-fg3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .close { margin: -4px -8px 0 0; }
 .body { padding: 20px 24px 4px; overflow: auto; display: flex; flex-direction: column; gap: 20px; }
+.ids { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ids .input { width: 100%; font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) { .ids { grid-template-columns: 1fr; } }
 textarea.note { width: 100%; min-height: 128px; max-height: 40vh; }
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .section-head .field-label { margin: 0; }

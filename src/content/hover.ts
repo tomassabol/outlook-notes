@@ -1,20 +1,30 @@
 import { hasContent } from '../shared/store';
-import { h, pill } from '../shared/dom';
-import { icon, type IconName } from '../shared/icons';
+import { FIELD_NAMES, fieldBox, h, pill } from '../shared/dom';
 import type { EditorFocus } from '../shared/types';
 import { openEditor } from './editor-frame';
 import { rowFromTarget } from './selectors';
 import { subjectFor } from './target';
 import { dataFor, labelsOf } from './state';
-import { makeHost, setContent } from './ui';
+import { copyable, labelCopyText, makeHost, setContent } from './ui';
 
 const SHOW_DELAY = 400;
 /** Time to move the pointer from the row onto the card (or back) before it closes. */
-const HIDE_GRACE = 300;
+const HIDE_GRACE = 700;
+/**
+ * While a card is open, the pointer must *rest* this long on another row before the card
+ * switches to it. Moving across rows on the way to the card (the usual diagonal path) doesn't
+ * count, because every mousemove restarts the timer.
+ */
+const SWITCH_DELAY = 450;
+/** The card overlaps the row by this much so there's no dead gap between them. */
+const OVERLAP = 4;
 
 let currentRow: HTMLElement | null = null;
 let showTimer: number | undefined;
 let hideTimer: number | undefined;
+let switchTimer: number | undefined;
+/** Another row the pointer is over while a card is open (a possible switch target). */
+let pending: { row: HTMLElement; convId: string } | null = null;
 let pointerX = 0;
 let card: HTMLElement | null = null;
 let overCard = false;
@@ -32,6 +42,8 @@ function hasSelection(): boolean {
 function hide(): void {
   clearTimeout(showTimer);
   clearTimeout(hideTimer);
+  clearTimeout(switchTimer);
+  pending = null;
   card?.remove();
   card = null;
   overCard = false;
@@ -41,10 +53,24 @@ function hide(): void {
 function scheduleHide(): void {
   clearTimeout(hideTimer);
   hideTimer = window.setTimeout(() => {
-    if (overCard || selecting || hasSelection()) return;
+    // Over another row: the switch timer decides instead.
+    if (overCard || selecting || hasSelection() || pending) return;
     currentRow = null;
     hide();
   }, HIDE_GRACE);
+}
+
+/** (Re)start the timer that switches the open card to the row the pointer is resting on. */
+function restartSwitch(): void {
+  clearTimeout(switchTimer);
+  switchTimer = window.setTimeout(() => {
+    const target = pending;
+    if (!target || overCard || selecting || hasSelection()) return;
+    pending = null;
+    currentRow = target.row;
+    hide();
+    if (hasContent(dataFor(target.convId))) show(target.row, target.convId);
+  }, SWITCH_DELAY);
 }
 
 function show(row: HTMLElement, convId: string): void {
@@ -54,27 +80,31 @@ function show(row: HTMLElement, convId: string): void {
   const { host, root } = makeHost('data-onl-card', 'div');
   const labels = labelsOf(d);
   const note = d.n?.trim();
-  setContent(
-    root,
+  const fields = (['b', 'w'] as const)
+    .map((k) => [k, d[k]?.trim()] as const)
+    .filter(([, v]) => !!v)
+    .map(([k, v]) => copyable(fieldBox(v!, FIELD_NAMES[k]), v!));
+  const hasTop = labels.length > 0 || fields.length > 0;
+  // Clicking the card (anywhere except a label or field, which copy) opens the editor.
+  const body = clickToEdit(
     h(
       'div',
       { class: 'card', role: 'tooltip' },
-      h(
-        'div',
-        { class: 'caption' },
-        icon(note ? 'note16' : 'tag16'),
-        h('span', { class: 'spacer' }, note ? 'Note' : 'Labels'),
-        button(note ? 'Edit' : 'Add note', note ? 'edit16' : 'noteAdd16', note ? 'Edit note' : 'Add note', convId, 'note'),
-        button('', 'tag16', 'Edit labels', convId, 'labels', true),
-      ),
-      labels.length ? clickToEdit(h('div', { class: 'pills editable', title: 'Click to edit labels' }, ...labels.map((l) => pill(l))), convId, 'labels') : null,
-      note ? clickToEdit(h('div', { class: 'note editable', title: 'Click to edit' }, note), convId, 'note') : null,
+      labels.length ? h('div', { class: 'pills' }, ...labels.map((l) => copyable(pill(l), labelCopyText(l)))) : null,
+      fields.length ? h('div', { class: 'fields stack' }, ...fields) : null,
+      note && hasTop ? h('div', { class: 'divider', role: 'separator' }) : null,
+      note ? h('div', { class: 'note editable', title: 'Click to edit' }, note) : null,
     ),
+    convId,
+    'note',
   );
+  setContent(root, body);
 
   host.addEventListener('mouseenter', () => {
     overCard = true;
     clearTimeout(hideTimer);
+    clearTimeout(switchTimer);
+    pending = null;
   });
   host.addEventListener('mouseleave', (e) => {
     overCard = false;
@@ -94,8 +124,8 @@ function show(row: HTMLElement, convId: string): void {
   const r = row.getBoundingClientRect();
   const { width, height } = host.getBoundingClientRect();
   const x = Math.min(Math.max(8, pointerX - 24), innerWidth - width - 8);
-  let y = r.bottom + 2;
-  if (y + height > innerHeight - 8) y = Math.max(8, r.top - height - 2);
+  let y = r.bottom - OVERLAP;
+  if (y + height > innerHeight - 8) y = Math.max(8, r.top - height + OVERLAP);
   host.style.left = `${x}px`;
   host.style.top = `${y}px`;
   host.style.visibility = '';
@@ -127,40 +157,49 @@ function clickToEdit<T extends HTMLElement>(el: T, convId: string, focus: Editor
   return el;
 }
 
-function button(text: string, ic: IconName, title: string, convId: string, focus: EditorFocus, iconOnly = false): HTMLButtonElement {
-  return h(
-    'button',
-    {
-      class: iconOnly ? 'btn icon-only' : 'btn',
-      type: 'button',
-      title,
-      'aria-label': title,
-      onclick: (() => edit(convId, focus)) as EventListener,
-    },
-    icon(ic),
-    iconOnly ? null : text,
-  );
-}
-
 const inCard = (e: Event) => !!card && e.composedPath().includes(card);
 
 export function initHover(): void {
-  document.addEventListener('mousemove', (e) => (pointerX = e.clientX), { passive: true, capture: true });
+  document.addEventListener(
+    'mousemove',
+    (e) => {
+      pointerX = e.clientX;
+      // Still moving over another row: not a deliberate stop yet, so keep postponing the switch.
+      if (pending && pending.row.contains(e.target as Node)) restartSwitch();
+    },
+    { passive: true, capture: true },
+  );
 
   document.addEventListener(
     'mouseover',
     (e) => {
       if (inCard(e)) return;
       const hit = rowFromTarget(e.target);
-      if (!hit) return;
-      if (hit.row === currentRow) {
-        clearTimeout(hideTimer); // came back to the same row
+      if (!hit) {
+        // Off the rows (and not on the card): forget any switch target; the grace period runs.
+        if (pending) {
+          pending = null;
+          clearTimeout(switchTimer);
+          if (card && !overCard) scheduleHide();
+        }
         return;
       }
-      // Keep a card with selected text until the user clicks elsewhere.
-      if (card && (selecting || hasSelection())) return;
+      if (hit.row === currentRow) {
+        // Back on the card's own row.
+        clearTimeout(hideTimer);
+        clearTimeout(switchTimer);
+        pending = null;
+        return;
+      }
+      if (card) {
+        // A card is open: the pointer may just be passing over this row on its way to the card.
+        if (selecting || hasSelection()) return; // keep a card with selected text
+        pending = hit;
+        restartSwitch();
+        return;
+      }
       currentRow = hit.row;
-      hide();
+      clearTimeout(showTimer);
       if (!hasContent(dataFor(hit.convId))) return;
       showTimer = window.setTimeout(() => show(hit.row, hit.convId), SHOW_DELAY);
     },

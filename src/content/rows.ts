@@ -30,7 +30,7 @@ const more = (n: number, labels: Label[]) =>
  */
 function layouts(note: boolean, labels: Label[]): (() => HTMLElement)[] {
   const box = (...kids: (Node | null)[]) =>
-    h('span', { class: 'row' }, note ? h('span', { class: 'noteicon', title: 'Has a note' }, icon('note16')) : null, ...kids);
+    h('span', { class: 'row' }, note ? h('span', { class: 'noteicon', title: 'Has a note, B number or work order' }, icon('note16')) : null, ...kids);
   const out: (() => HTMLElement)[] = [];
   if (labels.length) {
     // 1. full tags (up to 3) + "+N"
@@ -51,7 +51,7 @@ function layouts(note: boolean, labels: Label[]): (() => HTMLElement)[] {
 
 function render(host: HTMLElement, d: ConvData, budget: number): void {
   const root = host.shadowRoot!;
-  const options = layouts(!!d.n?.trim(), labelsOf(d));
+  const options = layouts(!!(d.n?.trim() || d.b?.trim() || d.w?.trim()), labelsOf(d));
   for (let i = 0; i < options.length; i++) {
     setContent(root, options[i]());
     const used = (root.lastElementChild as HTMLElement).getBoundingClientRect().width;

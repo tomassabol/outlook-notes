@@ -1,12 +1,13 @@
 {
   "name": "outlook-notes",
-  "version": "0.2.3",
+  "version": "0.3.8",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node build.mjs",
-    "watch": "node build.mjs --watch",
-    "typecheck": "tsc --noEmit"
+    "build": "bun build.mjs",
+    "watch": "bun build.mjs --watch",
+    "typecheck": "bunx tsc --noEmit",
+    "dev": "bun dev/server.ts"
   },
   "devDependencies": {
     "@fluentui/svg-icons": "1.1.346",

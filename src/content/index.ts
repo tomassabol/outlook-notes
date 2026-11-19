@@ -5,6 +5,7 @@ import { initMenu } from './menu';
 import { initEditorFrame } from './editor-frame';
 import { initTargetTracking } from './target';
 import { loadState, state, watchState } from './state';
+import { migrateLabels } from '../shared/store';
 import { detectTheme } from './theme';
 
 const MIN_INTERVAL = 120;
@@ -35,6 +36,9 @@ function run(): void {
 const observer = new MutationObserver(schedule);
 
 async function boot(): Promise<void> {
+  // Also run label migrations here (not only on extension update), so renamed defaults
+  // reach Outlook even if Chrome didn't fire an update event. It's a no-op once applied.
+  await migrateLabels().catch(() => false);
   await Promise.all([loadState(), initBanner()]);
   initTargetTracking();
   initHover();

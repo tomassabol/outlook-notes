@@ -1,12 +1,12 @@
 import { hasContent } from '../shared/store';
-import { h, pill } from '../shared/dom';
+import { FIELD_NAMES, fieldBox, h, pill } from '../shared/dom';
 import { icon, type IconName } from '../shared/icons';
 import type { EditorFocus } from '../shared/types';
 import { openEditor } from './editor-frame';
 import { findBannerAnchor, findReadingPane } from './selectors';
 import { dataFor, labelsOf, signature, state } from './state';
 import { currentOpenConvId, subjectFor } from './target';
-import { makeHost, setContent } from './ui';
+import { copyable, labelCopyText, makeHost, setContent } from './ui';
 
 const ATTR = 'data-onl-banner';
 const COLLAPSE_KEY = 'bannerCollapsed';
@@ -74,11 +74,19 @@ export function updateBanner(): void {
     updateBanner();
   };
 
-  const labelPills = labels.length ? h('span', { class: 'pills' }, ...labels.map((l) => pill(l))) : null;
+  const labelPills = labels.length ? h('span', { class: 'pills' }, ...labels.map((l) => copyable(pill(l), labelCopyText(l)))) : null;
+  const fieldEls = (['b', 'w'] as const)
+    .map((k) => [k, d[k]?.trim()] as const)
+    .filter(([, v]) => !!v)
+    .map(([k, v]) => copyable(fieldBox(v!, FIELD_NAMES[k]), v!));
+  const fieldsRow = fieldEls.length ? h('span', { class: 'fields' }, ...fieldEls) : null;
+  // Head: "Note" when there's a note; otherwise the first of labels / fields.
+  const headContent = note ? h('span', { class: 'title' }, 'Note') : (labelPills ?? fieldsRow);
+  const rest = [labelPills, fieldsRow].filter((x): x is HTMLSpanElement => !!x && x !== headContent);
   const head = h(
     'div',
     { class: 'head' },
-    note ? h('span', { class: 'title' }, 'Note') : labelPills,
+    headContent,
     isCollapsed ? h('span', { class: 'peek' }, note.split('\n')[0]) : null,
   );
   const actions = h(
@@ -95,7 +103,7 @@ export function updateBanner(): void {
       'div',
       { class: 'bar', role: 'note', 'aria-label': 'Your note' },
       h('div', { class: 'top' }, h('span', { class: 'lead' }, icon(note ? 'note20' : 'tag20')), head, actions),
-      note && labelPills ? h('div', { class: 'indent' }, labelPills) : null,
+      rest.length ? h('div', { class: 'indent' }, ...rest) : null,
       note && !isCollapsed ? h('div', { class: 'text' }, note) : null,
     ),
   );

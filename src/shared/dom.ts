@@ -37,3 +37,10 @@ export function injectStyle(root: Document | ShadowRoot, css: string): HTMLStyle
   (root instanceof Document ? root.head : root).append(s);
   return s;
 }
+
+export const FIELD_NAMES = { b: 'B number', w: 'Work order' } as const;
+
+/** B number / work order value shown as a boxed, monospaced-digit field. */
+export function fieldBox(value: string, name: string): HTMLSpanElement {
+  return h('span', { class: 'field', title: name, 'aria-label': `${name}: ${value}` }, value);
+}

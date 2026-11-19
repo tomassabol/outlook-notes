@@ -32,15 +32,23 @@ export function convKey(convId: string): string {
 }
 
 export function hasContent(d: ConvData | undefined | null): d is ConvData {
-  return !!d && (!!d.n?.trim() || !!d.l?.length);
+  return !!d && (!!d.n?.trim() || !!d.l?.length || !!d.b?.trim() || !!d.w?.trim());
 }
 
 export const DEFAULT_LABELS: Label[] = [
-  { id: 'urgent', emoji: '🔥', text: 'Urgent', color: 'Red' },
-  { id: 'waiting', emoji: '⏳', text: 'Waiting', color: 'Marigold' },
-  { id: 'followup', emoji: '📌', text: 'Follow up', color: 'Blue' },
-  { id: 'invoice', emoji: '💰', text: 'Invoice', color: 'Green' },
+  { id: 'urgent', emoji: '🔥', text: 'Akut', color: 'Red' },
+  { id: 'waiting', emoji: '⏳', text: 'Inväntar svar', color: 'Marigold' },
+  { id: 'followup', emoji: '📌', text: 'Följ upp', color: 'Blue' },
+  { id: 'invoice', emoji: '💰', text: 'Offert', color: 'Green' },
 ];
+
+/** Default labels renamed to Swedish (v0.3.1, Följ upp in v0.3.3); existing labels still using the old name are updated. */
+const RENAMED_DEFAULTS: Record<string, [from: string, to: string]> = {
+  urgent: ['Urgent', 'Akut'],
+  waiting: ['Waiting', 'Inväntar svar'],
+  invoice: ['Invoice', 'Offert'],
+  followup: ['Follow up', 'Följ upp'],
+};
 
 export function newId(): string {
   return crypto.randomUUID().replace(/-/g, '').slice(0, 8);
@@ -106,11 +114,19 @@ export function friendlyError(e: unknown): string {
   return msg;
 }
 
-/** Converts labels saved with v0.1 hex colors to palette names. Returns true if anything changed. */
+/**
+ * Converts labels saved with v0.1 hex colors to palette names, and renames default labels the
+ * user never renamed (English → Swedish). Returns true if anything changed.
+ */
 export async function migrateLabels(): Promise<boolean> {
   const labels = await getLabels();
   let changed = false;
   for (const l of labels) {
+    const rename = RENAMED_DEFAULTS[l.id];
+    if (rename && l.text === rename[0]) {
+      l.text = rename[1];
+      changed = true;
+    }
     if (!(l.color in PALETTE)) {
       l.color = paletteName(l.color);
       changed = true;
@@ -130,5 +146,7 @@ export function isConvData(x: unknown): x is ConvData {
   const d = x as ConvData;
   return !!d && typeof d === 'object' && typeof d.u === 'number' &&
     (d.n === undefined || typeof d.n === 'string') &&
+    (d.b === undefined || typeof d.b === 'string') &&
+    (d.w === undefined || typeof d.w === 'string') &&
     (d.l === undefined || (Array.isArray(d.l) && d.l.every((i) => typeof i === 'string')));
 }

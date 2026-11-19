@@ -12,6 +12,10 @@ export interface ConvData {
   n?: string;
   /** label ids */
   l?: string[];
+  /** B number, e.g. "B12345" */
+  b?: string;
+  /** work order number, e.g. "WO-12345" */
+  w?: string;
   /** subject snapshot (≤60 chars) */
   s: string;
   /** updated-at, epoch ms */

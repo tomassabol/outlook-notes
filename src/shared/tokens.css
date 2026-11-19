@@ -74,3 +74,24 @@
 
 /* ----- Fluent icons ----- */
 .icon { display: inline-block; flex: 0 0 auto; fill: currentColor; vertical-align: middle; }
+
+/* ----- B number / work order field ----- */
+.field {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--onl-stroke1);
+  border-radius: var(--onl-radius-m);
+  background: var(--onl-bg1);
+  color: var(--onl-fg1);
+  font: 600 14px/20px var(--onl-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fields { display: flex; flex-wrap: wrap; gap: 6px; }

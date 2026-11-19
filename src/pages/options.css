@@ -55,6 +55,8 @@ main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
 .note-item .main { flex: 1; min-width: 0; }
 .note-item .top { display: flex; align-items: baseline; gap: 8px; }
 .note-item .subj { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-item .fields { margin-top: 6px; }
+.note-item .fields .field { height: 24px; padding: 0 8px; font-size: 13px; }
 .note-item .pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .note-item .text {
   margin-top: 4px; color: var(--onl-fg2); white-space: pre-wrap; overflow-wrap: anywhere;
