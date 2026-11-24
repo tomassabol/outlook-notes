@@ -1,6 +1,6 @@
 # Outlook Notes & Labels
 
-A Chrome extension for Outlook on the web that adds private notes and emoji labels to email conversations.
+A Chrome extension for Outlook on the web that adds private notes and emoji labels to email conversations, plus an [Outlook add-in](#outlook-desktop-add-in-new-outlook-for-windows-and-mac) for new Outlook on Windows and Mac.
 
 - **Notes:** plain text, one per conversation. A note icon marks noted emails in the list.
 - **B number & work order:** two optional fields per conversation (e.g. `B12345`, `WO-12345`), shown as boxed values only when filled in.
@@ -33,6 +33,46 @@ bun run dev
 ```
 
 This serves a fake Outlook inbox at http://localhost:8791 (`/?dark` for the dark theme, `/options.html` for the options page). It loads the real built extension from `dist/` with an in-memory `chrome.storage` stub kept in `localStorage`, and rebuilds on save, so you can try changes without reloading the extension. The mock lives in [`dev/mock/`](dev/mock) and the server in [`dev/server.ts`](dev/server.ts). Its DOM mirrors the Outlook attributes the extension relies on (see *How it finds emails*).
+
+## Outlook desktop add-in (new Outlook for Windows and Mac)
+
+New Outlook can't run Chrome extensions, so there is also an **Office add-in** with the same data model. It shows a side pane for the selected email:
+
+- **Note, B number and work order** for the conversation. Changes save automatically.
+- **Labels**, as toggles. A label is also applied to the email as an **Outlook category** named after it (e.g. `🔥 Akut`), so it shows in the message list on every device. Outlook only has 25 category colors, so the category uses the closest one to the label's color.
+- **Export / Import** of a JSON backup, in the same format as the Chrome extension's options page.
+
+### Where the data lives
+
+- Notes, B numbers, work orders, labels and which conversation has which label are kept in the add-in's browser storage (`localStorage`) **on this computer**. Each computer and each Outlook installation keeps its own copy. Nothing is sent to the add-in's host.
+- The only thing written to your mailbox is the **category**: its name and color in your category list, and the category on each labeled email.
+- Labels are the source of truth in the pane. When you open an email, its categories are updated to match: missing ones are added, and categories named after a label you removed are taken off. Other categories are left alone. Change labels in the pane rather than with Outlook's own *Categorize* menu.
+- Resetting Outlook or clearing its web cache can delete the add-in's storage. Export a backup now and then.
+- The Chrome extension and the add-in don't share data.
+
+### How it's served
+
+Office add-ins must load their code from an HTTPS URL. `manifest.xml` points to **GitHub Pages**, which serves only the static files (`taskpane.html`, `taskpane.js`, icons). The [Deploy Outlook add-in](.github/workflows/addin-pages.yml) workflow builds and publishes them on every push to `master`. There's no server and no backend.
+
+One-time setup: in the GitHub repo, open **Settings → Pages** and set **Source** to **GitHub Actions**.
+
+### Install
+
+1. Download `https://tomassabol.github.io/outlook-notes/manifest.xml`.
+2. In new Outlook, open **Apps** (or **Get add-ins**) → **My add-ins** → **Custom add-ins** → **Add a custom add-in** → **Add from file…**, and choose `manifest.xml`.
+3. Open an email and choose **Notes & Labels** in the message toolbar (in new Outlook it can be under **Apps** or the **…** menu).
+4. Click the **pin** icon at the top of the pane. While pinned, it stays open and follows the email you select.
+
+Updates need no reinstall: Outlook loads the latest code from GitHub Pages. Reinstall only when `manifest.xml` changes.
+
+### Develop
+
+```bash
+bun run build:addin   # builds dist-addin/ (set ADDIN_BASE_URL to serve it from somewhere else)
+bun run dev:addin     # http://localhost:8792/taskpane.html?mock
+```
+
+The mock mode runs the pane in a normal browser with fake emails. A bar at the bottom switches emails and shows the categories the pane applied. The code is in [`src/addin/`](src/addin): `taskpane.ts` (UI), `host.ts` (Office.js calls and the mock), `local-area.ts` (storage). The manifest template is [`addin/manifest.template.xml`](addin/manifest.template.xml).
 
 ## Look and feel
 
@@ -74,7 +114,10 @@ src/background.ts  seeds default labels, Chrome context-menu fallback, toolbar �
 src/content/       content script: rows, hover card, banner, menu injection, theme
 src/pages/         editor (runs in an iframe) and options page
 src/shared/        storage, types, DOM helpers, shared CSS tokens
+src/addin/         Outlook add-in task pane (new Outlook for Windows and Mac)
+addin/             add-in manifest template, task pane HTML, icons
 build.mjs          builds each entry as a standalone bundle into dist/
+build-addin.mjs    builds the add-in into dist-addin/ and writes manifest.xml
 ```
 
 The note editor is an extension page shown in an iframe overlay. That way keystrokes in the note never reach Outlook, and typing "r" or pressing Delete can't trigger Outlook's shortcuts.
