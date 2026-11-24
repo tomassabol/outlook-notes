@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Notes &amp; Labels for Outlook</title>
+  <link rel="icon" href="icons/icon-32.png">
+  <style>
+    :root { --fg: #242424; --muted: #616161; --bg: #ffffff; --card: #fafafa; --line: #e0e0e0; --brand: #0f6cbd; --brand-hover: #115ea3; }
+    @media (prefers-color-scheme: dark) {
+      :root { --fg: #ffffff; --muted: #adadad; --bg: #1f1f1f; --card: #292929; --line: #3d3d3d; --brand: #115ea3; --brand-hover: #0f6cbd; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/20px 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif; }
+    main { max-width: 560px; margin: 0 auto; padding: 48px 16px; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    h1 { font-size: 24px; line-height: 32px; font-weight: 600; margin: 0; }
+    p { margin: 0 0 16px; }
+    .muted { color: var(--muted); }
+    .btn { display: inline-flex; align-items: center; height: 32px; padding: 0 16px; border-radius: 4px; background: var(--brand); color: #fff; font-weight: 600; text-decoration: none; }
+    .btn:hover { background: var(--brand-hover); }
+    ol { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 16px 16px 36px; margin: 24px 0; }
+    li + li { margin-top: 8px; }
+    code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+    a { color: var(--brand); }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="icons/icon-64.png" width="40" height="40" alt="">
+      <h1>Notes &amp; Labels for Outlook</h1>
+    </header>
+    <p class="muted">Private notes, B number, work order and labels for email conversations in new Outlook on Windows and Mac. Notes are stored on your computer; this site only serves the add-in's code.</p>
+    <p><a class="btn" href="manifest.xml" download="manifest.xml">Download manifest.xml</a></p>
+    <ol>
+      <li>Download <code>manifest.xml</code> with the button above.</li>
+      <li>In new Outlook, open <b>Apps</b> (or <b>Get add-ins</b>) → <b>My add-ins</b> → <b>Custom add-ins</b> → <b>Add a custom add-in</b> → <b>Add from file…</b> and choose the file.</li>
+      <li>Open an email and choose <b>Notes &amp; Labels</b> in the message toolbar (it may be under <b>Apps</b> or the <b>…</b> menu).</li>
+      <li>Click the pin icon at the top of the pane so it stays open as you move between emails.</li>
+    </ol>
+    <p class="muted">Source and details: <a href="https://github.com/tomassabol/outlook-notes">github.com/tomassabol/outlook-notes</a></p>
+  </main>
+</body>
+</html>
