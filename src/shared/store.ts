@@ -3,7 +3,21 @@ import type { ConvData, Label } from './types';
 
 export const LABELS_KEY = 'labels';
 export const CONV_PREFIX = 'c:';
-const area = () => chrome.storage.sync;
+/** The subset of `chrome.storage.StorageArea` the store uses, so other hosts can plug in their own. */
+export interface KVArea {
+  get(keys: string | null): Promise<Record<string, unknown>>;
+  set(items: Record<string, unknown>): Promise<void>;
+  remove(keys: string | string[]): Promise<void>;
+  getBytesInUse(keys: null): Promise<number>;
+  readonly QUOTA_BYTES: number;
+}
+
+let customArea: KVArea | null = null;
+/** Use a different backing store (the Outlook add-in uses localStorage). Call before any other store function. */
+export function setStorageArea(a: KVArea): void {
+  customArea = a;
+}
+const area = (): KVArea => customArea ?? (chrome.storage.sync as unknown as KVArea);
 
 /** Fast 53-bit string hash. Conversation IDs are ~150 chars; hashing keeps keys short. */
 function cyrb53(str: string, seed = 0): number {
@@ -102,7 +116,7 @@ export async function deleteLabel(id: string): Promise<void> {
 
 export async function usage(): Promise<{ used: number; quota: number; items: number }> {
   const [used, all] = await Promise.all([area().getBytesInUse(null), area().get(null)]);
-  return { used, quota: chrome.storage.sync.QUOTA_BYTES, items: Object.keys(all).length };
+  return { used, quota: area().QUOTA_BYTES, items: Object.keys(all).length };
 }
 
 export function friendlyError(e: unknown): string {

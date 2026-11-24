@@ -7,11 +7,14 @@
     "build": "bun build.mjs",
     "watch": "bun build.mjs --watch",
     "typecheck": "bunx tsc --noEmit",
-    "dev": "bun dev/server.ts"
+    "dev": "bun dev/server.ts",
+    "build:addin": "bun build-addin.mjs",
+    "dev:addin": "bun dev/addin-server.ts"
   },
   "devDependencies": {
     "@fluentui/svg-icons": "1.1.346",
     "@types/chrome": "0.3.7",
+    "@types/office-js": "^1.0.618",
     "typescript": "5.9.3",
     "vite": "5.4.21"
   }
